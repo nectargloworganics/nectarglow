@@ -17,9 +17,13 @@ app.use(cors());
 app.use(express.json());
 
 // Routes
-app.use("/api/auth", authRoutes);
-app.use("/api/products", productRoutes);
+app.use("/api/auth", require("./routes/auth"));
 app.use("/api/cart", require("./routes/cart"));
+app.use("/api/admin/products", require("./routes/adminProducts"));
+app.use("/api/admin/orders", require("./routes/adminOrders"));
+app.use("/api/payment", require("./routes/payment"));
+
+
 
 app.get("/", (_, res) => {
   res.send("NectarGlow API running");
@@ -30,5 +34,6 @@ const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
 
 
