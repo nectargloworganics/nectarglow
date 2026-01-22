@@ -22,13 +22,14 @@ if (!token) {
   window.location.href = "login.html";
 }
 
+/* 🔥 WARM UP BACKEND (IMPORTANT) */
+fetch(`${API}/products`).catch(() => {});
+
 const cartDiv = document.getElementById("cart");
 const totalDiv = document.getElementById("total");
 
 fetch(`${API}/cart`, {
-  headers: {
-    Authorization: `Bearer ${token}`
-  }
+  headers: { Authorization: `Bearer ${token}` }
 })
 .then(res => res.json())
 .then(items => {
@@ -42,9 +43,8 @@ fetch(`${API}/cart`, {
 
   items.forEach(i => {
     total += i.price * i.quantity;
-
     cartDiv.innerHTML += `
-      <div style="border:1px solid #ccc; padding:10px; margin:10px;">
+      <div style="border:1px solid #ccc;padding:10px;margin:10px;">
         <b>${i.name}</b><br>
         Price: ₹${i.price}<br>
         Qty: ${i.quantity}
@@ -54,13 +54,11 @@ fetch(`${API}/cart`, {
 
   totalDiv.innerText = "Total: ₹" + total;
 });
-  
+
 function checkout() {
   fetch(`${API}/cart/checkout`, {
     method: "POST",
-    headers: {
-      "Authorization": `Bearer ${token}`
-    }
+    headers: { Authorization: `Bearer ${token}` }
   })
   .then(res => res.json())
   .then(data => {
@@ -68,11 +66,7 @@ function checkout() {
       alert(data.error);
       return;
     }
-
-    // Save order_id for payment
     localStorage.setItem("order_id", data.order_id);
-
-    // Go to checkout page
     window.location.href = "checkout.html";
   });
 }
