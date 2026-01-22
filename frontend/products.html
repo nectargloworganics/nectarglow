@@ -1,30 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>NectarGlow Products</title>
+</head>
+<body>
+
+<h2>Products</h2>
+
+<div id="products"></div>
+
+<script>
 const API = "https://nectarglow.onrender.com/api";
 const token = localStorage.getItem("token");
 
+// Fetch products
 fetch(`${API}/products`)
   .then(res => res.json())
   .then(products => {
     const div = document.getElementById("products");
-    products.forEach(p => {
-      div.innerHTML += `
-        <div>
-          <h3>${p.name}</h3>
-          <p>₹${p.price}</p>
-          <button onclick="addToCart('${p.id}')">Add to Cart</button>
-        </div>
-      `;
-    });
-  });
+    div.innerHTML = "";
 
-function addToCart(productId) {
-  fetch(`${API}/cart/add`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${token}`
-    },
-    body: JSON.stringify({ product_id: productId })
-  })
-  .then(res => res.json())
-  .then(() => alert("Added to cart"));
-}
+    products.forEach(p => {
+      const productDiv = document.createElement("div");
+      productDiv.style.border = "1px solid #ccc";
+      productDiv.style.margin = "10px";
+      productDiv.style.padding = "10px";
+
+      productDiv.innerHTML = `
+        <h3>${p.name}</h3>
+        <p>₹${p.price}</p>
+        <button onclick="addToCart('${p.id}')">Add to Cart</but
