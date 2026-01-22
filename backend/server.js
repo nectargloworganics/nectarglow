@@ -1,39 +1,34 @@
-require("dotenv").config();
 const express = require("express");
-const os = require('os');
 const cors = require("cors");
-
-const authRoutes = require("./routes/auth");
-const productRoutes = require("./routes/products");
-const cartRoutes = require("./routes/cart");
+require("dotenv").config();
 
 const app = express();
 
-// Optional: Detect CPU cores and set WEB_CONCURRENCY if not already set
-process.env.WEB_CONCURRENCY = process.env.WEB_CONCURRENCY || os.cpus().length;
-console.log(`WEB_CONCURRENCY set to: ${process.env.WEB_CONCURRENCY}`);
-
+// Middleware
 app.use(cors());
 app.use(express.json());
+
+// Health check
+app.get("/", (req, res) => {
+  res.send("NectarGlow Backend Running");
+});
 
 // Routes
 app.use("/api/auth", require("./routes/auth"));
 app.use("/api/cart", require("./routes/cart"));
-app.use("/api/admin/products", require("./routes/adminProducts"));
-app.use("/api/admin/orders", require("./routes/adminOrders"));
 app.use("/api/payment", require("./routes/payment"));
 
+// Admin routes
+app.use("/api/admin/products", require("./routes/adminProducts"));
+app.use("/api/admin/orders", require("./routes/adminOrders"));
 
-
-app.get("/", (_, res) => {
-  res.send("NectarGlow API running");
+// 404 handler
+app.use((req, res) => {
+  res.status(404).json({ error: "Route not found" });
 });
 
-// Use Render's PORT environment variable, fallback to 10000 for local testing
-const PORT = process.env.PORT || 10000;
+// Server start
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
-
-
-
