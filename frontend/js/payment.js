@@ -1,14 +1,16 @@
 const API = "https://nectarglow.onrender.com/api";
-
-// Must already be set during checkout
 const token = localStorage.getItem("token");
 const ORDER_ID = localStorage.getItem("order_id");
+
+const statusEl = document.getElementById("status");
 
 function payNow() {
   if (!ORDER_ID) {
     alert("Order not found");
     return;
   }
+
+  statusEl.innerText = "Preparing secure payment, please wait...";
 
   fetch(`${API}/payment/create-order`, {
     method: "POST",
@@ -21,7 +23,7 @@ function payNow() {
   .then(res => res.json())
   .then(data => {
     if (!data.razorpayOrderId) {
-      alert("Failed to initiate payment");
+      statusEl.innerText = "Payment initialization failed";
       return;
     }
 
@@ -37,12 +39,14 @@ function payNow() {
       }
     };
 
-    const rzp = new Razorpay(options);
-    rzp.open();
+    statusEl.innerText = "";
+    new Razorpay(options).open();
   });
 }
 
 function verifyPayment(response) {
+  statusEl.innerText = "Verifying payment...";
+
   fetch(`${API}/payment/verify`, {
     method: "POST",
     headers: {
