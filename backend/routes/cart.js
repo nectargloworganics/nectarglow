@@ -1,33 +1,24 @@
-const express = require("express");
-const router = express.Router();
-const pool = require("../db");
-const authMiddleware = require("../middleware/authMiddleware");
-
-// POST /api/cart/add
-router.post("/add", authMiddleware, async (req, res) => {
+router.get("/", authMiddleware, async (req, res) => {
   try {
-    const userId = req.user.id; // from JWT
-    const { product_id, quantity = 1 } = req.body;
+    const userId = req.user.id;
 
-    if (!product_id) {
-      return res.status(400).json({ error: "product_id is required" });
-    }
-
-    await pool.query(
+    const result = await pool.query(
       `
-      INSERT INTO cart (user_id, product_id, quantity)
-      VALUES ($1, $2, $3)
-      ON CONFLICT (user_id, product_id)
-      DO UPDATE SET quantity = cart.quantity + $3
+      SELECT 
+        c.id,
+        p.name,
+        p.price,
+        c.quantity,
+        (p.price * c.quantity) AS total
+      FROM cart c
+      JOIN products p ON p.id = c.product_id
+      WHERE c.user_id = $1
       `,
-      [userId, product_id, quantity]
+      [userId]
     );
 
-    res.json({ message: "Added to cart" });
+    res.json(result.rows);
   } catch (err) {
-    console.error("Cart error:", err);
-    res.status(500).json({ error: "Failed to add to cart" });
+    res.status(500).json({ error: "Failed to fetch cart" });
   }
 });
-
-module.exports = router;
