@@ -3,15 +3,19 @@
 <head>
   <meta charset="UTF-8" />
   <title>NectarGlow Checkout</title>
+
+  <!-- ✅ PRELOAD RAZORPAY -->
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 </head>
 <body>
 
-<h2>NectarGlow Checkout</h2>
-<p>Complete your payment to place the order.</p>
+<h2>Checkout</h2>
+
+<p id="status"></p>
 
 <button onclick="payNow()">Pay Now</button>
 
-<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script src="js/payment.js"></script>
+
 </body>
 </html>
