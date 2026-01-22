@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>NectarGlow Admin Dashboard</title>
+</head>
+<body>
+
+<h2>Admin Dashboard</h2>
+
+<button onclick="logout()">Logout</button>
+
+<hr>
+
+<h3>Add Product</h3>
+<input id="pname" placeholder="Product Name"><br><br>
+<input id="pprice" type="number" placeholder="Price"><br><br>
+<textarea id="pdesc" placeholder="Description"></textarea><br><br>
+<button onclick="addProduct()">Add Product</button>
+
+<p id="productMsg"></p>
+
+<hr>
+
+<h3>Orders</h3>
+<div id="orders"></div>
+
+<script src="js/admin.js"></script>
+</body>
+</html>
