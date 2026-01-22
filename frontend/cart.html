@@ -1,10 +1,82 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>NectarGlow Cart</title>
+</head>
 <body>
-<h2>Your Cart</h2>
-<div id="cart"></div>
-<h3 id="grandTotal"></h3>
 
-<script src="js/cart.js"></script>
+<h2>Your Cart</h2>
+
+<div id="cart"></div>
+<h3 id="total"></h3>
+
+<button onclick="checkout()">Checkout</button>
+
+<script>
+const API = "https://nectarglow.onrender.com/api";
+const token = localStorage.getItem("token");
+
+if (!token) {
+  alert("Please login first");
+  window.location.href = "login.html";
+}
+
+const cartDiv = document.getElementById("cart");
+const totalDiv = document.getElementById("total");
+
+fetch(`${API}/cart`, {
+  headers: {
+    Authorization: `Bearer ${token}`
+  }
+})
+.then(res => res.json())
+.then(items => {
+  if (!items.length) {
+    cartDiv.innerText = "Your cart is empty";
+    return;
+  }
+
+  let total = 0;
+  cartDiv.innerHTML = "";
+
+  items.forEach(i => {
+    total += i.price * i.quantity;
+
+    cartDiv.innerHTML += `
+      <div style="border:1px solid #ccc; padding:10px; margin:10px;">
+        <b>${i.name}</b><br>
+        Price: ₹${i.price}<br>
+        Qty: ${i.quantity}
+      </div>
+    `;
+  });
+
+  totalDiv.innerText = "Total: ₹" + total;
+});
+  
+function checkout() {
+  fetch(`${API}/cart/checkout`, {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${token}`
+    }
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.error) {
+      alert(data.error);
+      return;
+    }
+
+    // Save order_id for payment
+    localStorage.setItem("order_id", data.order_id);
+
+    // Go to checkout page
+    window.location.href = "checkout.html";
+  });
+}
+</script>
+
 </body>
 </html>
