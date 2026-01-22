@@ -1,9 +1,9 @@
-const router = require("express").Router();
-const db = require("../db");
+const express = require('express');
+const router = express.Router();
 
-router.get("/", async (_, res) => {
-  const result = await db.query("SELECT * FROM products ORDER BY created_at DESC");
-  res.json(result.rows);
+// Example route
+router.get('/', (req, res) => {
+  res.json({ message: 'Products route working' });
 });
 
 module.exports = router;
