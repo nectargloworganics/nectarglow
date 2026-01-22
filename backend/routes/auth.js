@@ -1,35 +1,52 @@
 router.post("/login", async (req, res) => {
-  const { email, password } = req.body;
+  try {
+    let { email, mobile, password } = req.body;
 
-  const result = await pool.query(
-    "SELECT * FROM users WHERE email=$1",
-    [email]
-  );
+    if (!password || (!email && !mobile)) {
+      return res.status(400).json({ error: "Email or mobile and password required" });
+    }
 
-  if (!result.rows.length) {
-    return res.status(401).json({ error: "Invalid login" });
+    if (email) email = email.trim().toLowerCase();
+    if (mobile) mobile = mobile.trim();
+
+    // Step 1: Find user by email OR mobile
+    const result = await pool.query(
+      `SELECT * FROM users
+       WHERE email = $1 OR mobile = $2`,
+      [email || null, mobile || null]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(401).json({ error: "Invalid login" });
+    }
+
+    const user = result.rows[0];
+
+    // Step 2: Compare password
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ error: "Invalid login" });
+    }
+
+    // Step 3: Create JWT
+    const token = jwt.sign(
+      {
+        id: user.id,
+        email: user.email,
+        role: user.role
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+
+    res.json({ token });
+
+  } catch (err) {
+    console.error("Login error:", err.message);
+    res.status(500).json({ error: "Login failed" });
   }
-
-  const user = result.rows[0];
-  const valid = await bcrypt.compare(password, user.password);
-
-  if (!valid) {
-    return res.status(401).json({ error: "Invalid login" });
-  }
-
- const token = jwt.sign(
-  {
-    id: user.id,
-    email: user.email,
-    role: user.role   // ✅ ADD THIS
-  },
-  process.env.JWT_SECRET,
-  { expiresIn: "7d" }
-);
-
-
-  res.json({ token });
 });
+
 
 
 
@@ -77,3 +94,4 @@ router.post("/register", async (req, res) => {
     res.status(500).json({ error: "Registration failed" });
   }
 });
+
